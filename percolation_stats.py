@@ -44,16 +44,22 @@ class PercolationStats:
     
     def mean(self):
         """Sample mean of percolation threshold."""
-        pass
+        return sum(self.thresholds) / self.t
 
     def stddev(self):
         """Sample standard deviation of percolation threshold."""
-        pass
+        # Standard deviation is undefined for a single trial
+        if self.t == 1:
+            return float('nan')
+       
+        current_mean = self.mean()
+        variance = sum((x - current_mean) ** 2 for x in self.thresholds) / (self.t - 1)
+        return math.sqrt(variance)
 
     def confidenceLo(self):
         """Low endpoint of 95% confidence interval."""
-        pass
+        return self.mean() - ((1.96 * self.stddev()) / math.sqrt(self.t))
 
     def confidenceHi(self):
         """High endpoint of 95% confidence interval."""
-        pass
+        return self.mean() + ((1.96 * self.stddev()) / math.sqrt(self.t))
