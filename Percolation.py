@@ -54,21 +54,59 @@ class Percolation:
         return (row - 1) * self.n + (col - 1)
 
     def open(self, row, col):
-        """
-        Opens the site at (row, col) if it is not open already.
-        Student B will implement the connection logic here.
-        """
-        pass
+            """
+            Opens the site at (row, col) if it is not open already.
+            Connects the newly opened site to all adjacent open sites.
+            """
+            if row < 1 or row > self.n or col < 1 or col > self.n:
+                raise ValueError("Index out of bounds")
+            
+            if self.is_open(row, col):
+                return
+            
+            # 1. Open the site and update the counter
+            self.grid[row - 1][col - 1] = True
+            self.open_sites_count += 1
+        
+            current_id = self._get_1d_index(row, col)
+        
+            # 2. Connect to Virtual Top if it is in the first row
+            if row == 1:
+                self.uf.union(current_id, self.virtual_top)
+            
+            # 3. Connect to Virtual Bottom if it is in the last row
+            if row == self.n:
+                self.uf.union(current_id, self.virtual_bottom)
+            
+            # 4. Connect to open neighbors (Up, Down, Left, Right)
+            directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+            for dr, dc in directions:
+                adj_row, adj_col = row + dr, col + dc
+                # Check if the neighbor is within the grid boundaries
+                if 1 <= adj_row <= self.n and 1 <= adj_col <= self.n:
+                    if self.is_open(adj_row, adj_col):
+                        adj_id = self._get_1d_index(adj_row, adj_col)
+                        self.uf.union(current_id, adj_id)
 
     def is_open(self, row, col):
         """Returns True if the site at (row, col) is open."""
-        pass
+        if row < 1 or row > self.n or col < 1 or col > self.n:
+            raise ValueError("Index out of bounds")
+        return self.grid[row - 1][col - 1]
 
     def is_full(self, row, col):
         """
         Returns True if the site is connected to the virtual top site.
         """
-        pass
+        if row < 1 or row > self.n or col < 1 or col > self.n:
+            raise ValueError("Index out of bounds")
+    
+        # A site cannot be full if it isn't even open
+        if not self.is_open(row, col):
+            return False
+        
+        current_id = self._get_1d_index(row, col)
+        return self.uf.connected(current_id, self.virtual_top)
 
     def number_of_open_sites(self):
         """Returns the total number of open sites."""
@@ -78,4 +116,8 @@ class Percolation:
         """
         Returns True if the system percolates (virtual top connects to virtual bottom).
         """
-        pass
+        # Edge case: A 1x1 grid that is blocked shouldn't percolate
+        if self.n == 1 and not self.is_open(1, 1):
+            return False
+        
+        return self.uf.connected(self.virtual_top, self.virtual_bottom)
