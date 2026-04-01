@@ -1,5 +1,6 @@
 import math
 import random
+import sys
 from Percolation import Percolation
 
 class PercolationStats:
@@ -64,3 +65,25 @@ class PercolationStats:
     def confidenceHi(self):
         """High endpoint of 95% confidence interval."""
         return self.mean() + ((1.96 * self.stddev()) / math.sqrt(self.t))
+    
+if __name__ == '__main__':
+
+    
+    # Default values if you just run 'python percolation_stats.py'
+    n = 200
+    t = 100
+    
+    # This lets you pass N and T from the terminal
+    if len(sys.argv) == 3:
+        n = int(sys.argv[1])
+        t = int(sys.argv[2])
+        
+    print(f"Running {t} trials on a {n}x{n} grid...")
+    
+    # 1. Instantiate the class to run the simulation
+    stats = PercolationStats(n, t)
+    
+    # 2. Print the results to the console
+    print(f"mean                    = {stats.mean()}")
+    print(f"stddev                  = {stats.stddev()}")
+    print(f"95% confidence interval = [{stats.confidenceLo()}, {stats.confidenceHi()}]")
