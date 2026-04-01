@@ -1,5 +1,6 @@
+import math
 import random
-from percolation import Percolation
+from Percolation import Percolation
 
 class PercolationStats:
     """
