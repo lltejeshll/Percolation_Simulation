@@ -10,15 +10,29 @@ class UnionFind:
 
     def find(self, p):
         # TODO: Implement path compression
-        pass
+        while p != self.parent[p]:
+            self.parent[p] = self.parent[self.parent[p]]
+            p = self.parent[p]
+        return p
 
     def union(self, p, q):
         # TODO: Implement weighted union logic
-        pass
+        root_p = self.find(p)
+        root_q = self.find(q)
+        if root_p == root_q:
+            return
+            
+        # Weighted tree balancing: link the smaller tree to the larger tree
+        if self.size[root_p] < self.size[root_q]:
+            self.parent[root_p] = root_q
+            self.size[root_q] += self.size[root_p]
+        else:
+            self.parent[root_q] = root_p
+            self.size[root_p] += self.size[root_q]
 
     def connected(self, p, q):
         # TODO: Return True if p and q have the same root
-        pass
+        return self.find(p) == self.find(q)
 
 
 class Percolation:
